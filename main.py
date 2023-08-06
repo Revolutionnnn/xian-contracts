@@ -1,3 +1,6 @@
+# Importante si se quiere que el propietario pague al jugador debe aprobar la cantidad que esta dispuesto a pagar desde su billetera
+# Tambien importante si se quiere jugar se debe aprobar que cantidad de monedas desea jugar
+
 random.seed() # Importo ramdon para que la maquina pueda jugar
 import currency # Import Currency para hacer trasacciones en la blockchain
 movement = Hash(default_value=0) # Declaro la variable de movimientos
