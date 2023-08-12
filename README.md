@@ -1,5 +1,7 @@
 # lamden-game
 
+# SPANISH
+
 Juego de Piedra, Papel o Tijera en Blockchain
 Este contrato inteligente implementa el clásico juego de Piedra, Papel o Tijera en la cadena de bloques. Los jugadores pueden participar apostando una cantidad de TAU (la moneda de la cadena de bloques) y eligiendo uno de los tres movimientos: piedra, papel o tijera. La computadora también elige un movimiento al azar. El resultado del juego se determina según las reglas tradicionales del juego.
 
@@ -15,7 +17,7 @@ Función de Consulta: Si deseas saber qué movimiento eligió la computadora, pu
 Contrato en Acción
 Este contrato utiliza la funcionalidad de Currency para realizar transacciones en la cadena de bloques. Los movimientos de los jugadores se almacenan en variables y se comparan para determinar el ganador. Si ganas, recibirás el premio; si no, el propietario se llevará el premio. ¡Diviértete jugando Piedra, Papel o Tijera en la cadena de bloques!
 
-README (English):
+# English
 
 Rock, Paper, Scissors Game on the Blockchain
 This smart contract implements the classic Rock, Paper, Scissors game on the blockchain. Players can participate by betting an amount of TAU (the blockchain's currency) and choosing one of the three moves: rock, paper, or scissors. The computer also randomly selects a move. The game's outcome is determined according to the traditional rules of the game.
