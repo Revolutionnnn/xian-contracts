@@ -5,7 +5,7 @@ turn = Hash(default_value=0)
 winner = Variable()
 player_1 = Variable()
 player_2 = Variable()
-players = Variable()
+wallets = Variable()
 
 @construct
 def seed():
@@ -13,20 +13,20 @@ def seed():
     movement['papel'] = 2
     movement['tijera'] = 3
     turn['turn'] = 1
-    players.set([])
+    wallets.set([])
     player_1.set(0)
     player_2.set(0)
 
 @export
 def play():
     # ASSERTS
-    for address in players.get():
+    for address in wallets.get():
         assert address != ctx.caller, 'You have played'
         turn['turn'] += 1
 
 
     # REGISTER WALLETS
-    players.set(players.get() + [ctx.caller])
+    wallets.set(wallets.get() + [ctx.caller])
 
     # REGISTER MOVEMENTS
     if turn['turn'] == 1:
@@ -37,7 +37,7 @@ def play():
 
 
 def value_empty():
-    players.set([])
+    wallets.set([])
     turn['turn'] = 1
 
 def determineWinner():
@@ -54,11 +54,3 @@ def determineWinner():
         winner.set('Gano jugador 1')
         value_empty()
         return winner.get()
-
-@export
-def WhoWin():
-    return winner.get()
-
-@export
-def Players():
-    return movement['players']
