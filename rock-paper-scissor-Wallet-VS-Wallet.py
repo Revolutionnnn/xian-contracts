@@ -51,6 +51,6 @@ def determineWinner():
         value_empty()
         return winner.get()
     else:
-        winner.set('Gano jugador 1')
+        winner.set('Gano jugador 2')
         value_empty()
         return winner.get()
