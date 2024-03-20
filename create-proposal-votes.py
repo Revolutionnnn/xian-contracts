@@ -38,3 +38,112 @@ def DownVote():
 @export
 def showVotes():
     return [Votes['UpVotes'], Votes['DownVotes']]
+
+
+
+#GEMINI
+from collections import defaultdict  # Use defaultdict for efficient data storage
+
+proposals = defaultdict(dict)  # Dictionary to store proposals with ID as key
+
+@construct
+def seed():
+    """
+    Initializes the votes with empty dictionaries for each proposal.
+    """
+    votes = defaultdict(dict)
+    votes["UpVotes"] = 0
+    votes["DownVotes"] = 0
+    return votes
+
+@export
+def createProposal(name: str, proposalVote: str):
+    """
+    Creates a new proposal with a unique ID, assigns it to the caller,
+    and returns relevant proposal information.
+    """
+    proposal_id = len(proposals)  # Generate unique ID based on proposal count
+    proposals[proposal_id]["name"] = name
+    proposals[proposal_id]["proposal"] = proposalVote
+    proposals[proposal_id]["creator"] = ctx.caller
+
+    # Extract proposal data
+    creator_proposal = proposals[proposal_id]["name"]
+    proposal = proposals[proposal_id]["proposal"]
+    upvotes = votes[proposal_id]["UpVotes"]
+    downvotes = votes[proposal_id]["DownVotes"]
+
+    return {
+        "proposal_id": proposal_id,
+        "creator_proposal": creator_proposal,
+        "proposal": proposal,
+        "upvotes": upvotes,
+        "downvotes": downvotes,
+    }
+
+@export
+def UpVote(proposal_id: int):
+    """
+    Registers an upvote for a specific proposal ID, preventing double voting.
+    """
+    votes = seed()  # Retrieve votes dictionary in case it's not cached
+
+    assert proposal_id in proposals, "Invalid proposal ID"
+    assert ctx.caller not in votes[proposal_id]["address"], "You have already voted"
+
+    votes[proposal_id]["address"].append(ctx.caller)
+    votes[proposal_id]["UpVotes"] += 1
+    return votes[proposal_id]
+
+@export
+def DownVote(proposal_id: int):
+    """
+    Registers a downvote for a specific proposal ID, preventing double voting.
+    """
+    votes = seed()  # Retrieve votes dictionary in case it's not cached
+
+    assert proposal_id in proposals, "Invalid proposal ID"
+    assert ctx.caller not in votes[proposal_id]["address"], "You have already voted"
+
+    votes[proposal_id]["address"].append(ctx.caller)
+    votes[proposal_id]["DownVotes"] += 1
+    return votes[proposal_id]
+
+@export
+def showProposal(proposal_id: int):
+    """
+    Retrieves and returns information for a specific proposal using its ID.
+    """
+    assert proposal_id in proposals, "Invalid proposal ID"
+
+    proposal = proposals[proposal_id]
+    upvotes = seed()[proposal_id]["UpVotes"]  # Retrieve current upvote count
+    downvotes = seed()[proposal_id]["DownVotes"]  # Retrieve current downvote count
+
+    return {
+        "proposal_id": proposal_id,
+        "creator_proposal": proposal["name"],
+        "proposal": proposal["proposal"],
+        "upvotes": upvotes,
+        "downvotes": downvotes,
+    }
+
+@export
+def showAllProposals():
+    """
+    Returns a list of dictionaries containing information for all proposals.
+    """
+    all_proposals = []
+    for proposal_id, proposal_data in proposals.items():
+        upvotes = seed()[proposal_id]["UpVotes"]  # Retrieve current upvote count
+        downvotes = seed()[proposal_id]["DownVotes"]  # Retrieve current downvote count
+
+        all_proposals.append({
+            "proposal_id": proposal_id,
+            "creator_proposal": proposal_data["name"],
+            "proposal": proposal_data["proposal"],
+            "upvotes": upvotes,
+            "downvotes": downvotes,
+        })
+    return all_proposals
+
