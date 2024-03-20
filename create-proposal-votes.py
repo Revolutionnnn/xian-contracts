@@ -42,36 +42,35 @@ def showVotes():
 
 
 #GEMINI
-from collections import defaultdict  # Use defaultdict for efficient data storage
-
-proposals = defaultdict(dict)  # Dictionary to store proposals with ID as key
+proposals = Hash()
+votes = Hash()
+ids = Variable()
 
 @construct
 def seed():
-    """
-    Initializes the votes with empty dictionaries for each proposal.
-    """
-    votes = defaultdict(dict)
-    votes["UpVotes"] = 0
-    votes["DownVotes"] = 0
-    return votes
+    ids.set(0)
 
 @export
-def createProposal(name: str, proposalVote: str):
+def createProposal(name: str, proposal: str):
     """
     Creates a new proposal with a unique ID, assigns it to the caller,
     and returns relevant proposal information.
     """
-    proposal_id = len(proposals)  # Generate unique ID based on proposal count
-    proposals[proposal_id]["name"] = name
-    proposals[proposal_id]["proposal"] = proposalVote
-    proposals[proposal_id]["creator"] = ctx.caller
 
-    # Extract proposal data
-    creator_proposal = proposals[proposal_id]["name"]
-    proposal = proposals[proposal_id]["proposal"]
-    upvotes = votes[proposal_id]["UpVotes"]
-    downvotes = votes[proposal_id]["DownVotes"]
+    number = ids.get()
+    # falta reparar los ids ya funciona crear la propuesta
+    proposal_id = number + 1
+    ids.set(proposal_id)
+    proposal_id = 1
+    proposals[proposal_id, "name"] = name
+    proposals[proposal_id, "proposal"] = proposal
+    proposals[proposal_id, "creator"] = ctx.caller
+
+    # Falta colocarle valor 0 a los votos
+    creator_proposal = proposals[proposal_id, "name"]
+    proposal = proposals[proposal_id, "proposal"]
+    upvotes = votes[proposal_id, "UpVotes"]
+    downvotes = votes[proposal_id, "DownVotes"]
 
     return {
         "proposal_id": proposal_id,
@@ -80,6 +79,7 @@ def createProposal(name: str, proposalVote: str):
         "upvotes": upvotes,
         "downvotes": downvotes,
     }
+# Este resto de codigo aun no funciona
 
 @export
 def UpVote(proposal_id: int):
