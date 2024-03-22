@@ -58,7 +58,6 @@ def createProposal(name: str, proposal: str):
     """
 
     number = ids.get()
-    # falta reparar los ids ya funciona crear la propuesta
     proposal_id = number + 1
     ids.set(proposal_id)
     proposal_id = 1
@@ -67,6 +66,8 @@ def createProposal(name: str, proposal: str):
     proposals[proposal_id, "creator"] = ctx.caller
 
     # Falta colocarle valor 0 a los votos
+    votes[proposal_id, "UpVotes"] = 0
+    votes[proposal_id, "DownVotes"] = 0
     creator_proposal = proposals[proposal_id, "name"]
     proposal = proposals[proposal_id, "proposal"]
     upvotes = votes[proposal_id, "UpVotes"]
@@ -86,7 +87,6 @@ def UpVote(proposal_id: int):
     """
     Registers an upvote for a specific proposal ID, preventing double voting.
     """
-    votes = seed()  # Retrieve votes dictionary in case it's not cached
 
     assert proposal_id in proposals, "Invalid proposal ID"
     assert ctx.caller not in votes[proposal_id, "address"], "You have already voted"
@@ -100,7 +100,6 @@ def DownVote(proposal_id: int):
     """
     Registers a downvote for a specific proposal ID, preventing double voting.
     """
-    votes = seed()  # Retrieve votes dictionary in case it's not cached
 
     assert proposal_id in proposals, "Invalid proposal ID"
     assert ctx.caller not in votes[proposal_id, "address"], "You have already voted"
