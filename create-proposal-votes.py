@@ -89,10 +89,10 @@ def UpVote(proposal_id: int):
     votes = seed()  # Retrieve votes dictionary in case it's not cached
 
     assert proposal_id in proposals, "Invalid proposal ID"
-    assert ctx.caller not in votes[proposal_id]["address"], "You have already voted"
+    assert ctx.caller not in votes[proposal_id, "address"], "You have already voted"
 
-    votes[proposal_id]["address"].append(ctx.caller)
-    votes[proposal_id]["UpVotes"] += 1
+    votes[proposal_id, "address"] = ctx.caller()
+    votes[proposal_id, "UpVotes"] += 1
     return votes[proposal_id]
 
 @export
@@ -103,10 +103,10 @@ def DownVote(proposal_id: int):
     votes = seed()  # Retrieve votes dictionary in case it's not cached
 
     assert proposal_id in proposals, "Invalid proposal ID"
-    assert ctx.caller not in votes[proposal_id]["address"], "You have already voted"
+    assert ctx.caller not in votes[proposal_id, "address"], "You have already voted"
 
-    votes[proposal_id]["address"].append(ctx.caller)
-    votes[proposal_id]["DownVotes"] += 1
+    votes[proposal_id, "address"].append(ctx.caller)
+    votes[proposal_id, "DownVotes"] += 1
     return votes[proposal_id]
 
 @export
@@ -117,8 +117,8 @@ def showProposal(proposal_id: int):
     assert proposal_id in proposals, "Invalid proposal ID"
 
     proposal = proposals[proposal_id]
-    upvotes = seed()[proposal_id]["UpVotes"]  # Retrieve current upvote count
-    downvotes = seed()[proposal_id]["DownVotes"]  # Retrieve current downvote count
+    upvotes = proposal[proposal_id]["UpVotes"]  # Retrieve current upvote count
+    downvotes = proposal[proposal_id]["DownVotes"]  # Retrieve current downvote count
 
     return {
         "proposal_id": proposal_id,
@@ -135,8 +135,8 @@ def showAllProposals():
     """
     all_proposals = []
     for proposal_id, proposal_data in proposals.items():
-        upvotes = seed()[proposal_id]["UpVotes"]  # Retrieve current upvote count
-        downvotes = seed()[proposal_id]["DownVotes"]  # Retrieve current downvote count
+        upvotes = proposal[proposal_id]["UpVotes"]  # Retrieve current upvote count
+        downvotes = proposal[proposal_id]["DownVotes"]  # Retrieve current downvote count
 
         all_proposals.append({
             "proposal_id": proposal_id,
