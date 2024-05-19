@@ -43,13 +43,13 @@ def Jugar(movimiento: int):
       currency.transfer_from(amount=premio.get(), to=ctx.caller,
             main_account=propietario.get())
         winner.set(ctx.caller)
-        return f'Ganaste revisa tu billetera {str(winner.get())} tu premio es de {str(premio.get())}'
+        return f"Ganaste revisa tu billetera {winner.get()} tu premio es de {premio.get()}"
     else:
         # La trasaccion si pierde el jugador se le envia al creador del contrato
         currency.transfer_from(amount=coste.get(), to=propietario.get(),
             main_account=ctx.caller)
         winner.set(propietario.get())
-        return f'Perdiste gano el dueño del contrato {str(winner.get())}'
+        return f"Perdiste gano el dueño del contrato {winner.get()}"
 
 @export
 def computadora():
