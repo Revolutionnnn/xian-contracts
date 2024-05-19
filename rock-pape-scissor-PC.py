@@ -9,6 +9,7 @@ propietario = Variable() # El propietario del contrato inteligente
 jugador = Variable() # El jugador externo
 computadora = Variable() # La computadora
 premio = Variable() # La cantidad de premio que se piensa dar
+coste = Variable() # La cantidad que vale jugar
 
 @construct
 def seed():
@@ -23,13 +24,13 @@ def seed():
     propietario.set(ctx.caller)
     # Variable para declarar que premio se quiere entrega
     premio.set(5.0)
+    coste.set(3.0)
 
 
 @export
-def Jugar(movimiento: int, precio: float):
+def Jugar(movimiento: int):
     # Validaciones de movimiento y precio del tiket si pierde
     assert movimiento < 4, 'No puedes hacer ese movimiento!'
-    assert precio == 3, 'El precio es 3 TAU'
     # Los movimientos de cada jugador
     jugador.set(movimiento)
     computadora.set(random.randint(1, 3))
@@ -45,7 +46,7 @@ def Jugar(movimiento: int, precio: float):
         return str(winner.get())
     else:
         # La trasaccion si pierde el jugador se le envia al creador del contrato
-        currency.transfer_from(amount=precio, to=propietario.get(),
+        currency.transfer_from(amount=coste.get(), to=propietario.get(),
             main_account=ctx.caller)
         winner.set(propietario.get())
         return str(winner.get())
