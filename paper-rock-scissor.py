@@ -5,7 +5,7 @@ winner = Variable()
 owner = Variable()
 player = Variable()
 computer = Variable()
-prize = Variable()
+reward = Variable()
 cost = Variable()
 
 @construct
@@ -16,7 +16,7 @@ def seed():
     player.set(movement['rock'])
     computer.set(movement['rock'])
     owner.set(ctx.caller)
-    prize.set(3.0)
+    reward.set(3.0)
     cost.set(1.0)
 
 def move_to_text(move: int) -> str:
@@ -46,7 +46,7 @@ def Play(move: int):
         (player.get() == movement['paper'] and computer.get() == movement['rock']) or 
         (player.get() == movement['scissors'] and computer.get() == movement['paper'])
     ):
-        currency.transfer_from(amount=prize.get(), to=ctx.caller, main_account=owner.get())
+        currency.transfer_from(amount=reward.get(), to=ctx.caller, main_account=owner.get())
         winner.set(ctx.caller)
         return f"You won! Your movement was {move_to_text(player.get())} and the computer was {move_to_text(computer.get())}"
     else:
@@ -59,6 +59,6 @@ def change_cost(amount: int):
     cost.set(amount)
 
 @export
-def change_price(amount: int):
+def change_reward(amount: int):
     assert owner.get() == ctx.caller, 'Only owner can change!'
-    prize.set(amount)
+    reward.set(amount)
