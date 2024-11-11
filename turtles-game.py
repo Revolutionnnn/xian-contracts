@@ -49,7 +49,7 @@ def start_race():
             weighted_turtle_list.extend([turtle_name] * repetitions)
 
     # Verificar que haya al menos dos jugadores (tortugas con apuestas)
-    assert len(weighted_turtle_list) > 0, "No turtles available to race"
+    assert len(weighted_turtle_list) > 1, "We need more turtles to race"
 
     # Seleccionar una tortuga ganadora al azar usando la lista ponderada
     winning_turtle = random.choice(weighted_turtle_list)
