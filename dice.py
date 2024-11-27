@@ -14,7 +14,7 @@ def initialize():
     reward.set(2.0)        # Default reward for winning.
 
 @export
-def transfer_if_greater(num1: int, num2: int):
+def transfer_if_greater(num1: int, num2: int, recipient: str):
     """
     Compares two numbers and performs a transfer if `num2` is greater than `num1`.
     Deducts `cost` from the player and rewards `reward` tokens if the player wins.
@@ -22,21 +22,23 @@ def transfer_if_greater(num1: int, num2: int):
     Args:
         num1 (int): The first number to compare.
         num2 (int): The second number to compare.
+        recipient (str): The wallet address to send tokens to if `num2 > num1`.
     """
     assert isinstance(num1, int) and isinstance(num2, int), 'Both num1 and num2 must be integers.'
-    assert ctx.caller == owner.get(), "Only the owner can access this function."
+    assert isinstance(recipient, str), 'Recipient must be a valid wallet address.'
 
     # Deduct cost from the player to the contract
     currency.transfer_from(amount=cost.get(), to=ctx.this, main_account=ctx.caller)
 
     if num2 > num1:
-        # Player wins, transfer reward from the contract to the player
+        # Player wins, transfer reward from the contract to the recipient
         assert currency.balance_of(ctx.this) >= reward.get(), "Contract has insufficient balance to pay the reward."
-        currency.transfer(amount=reward.get(), to=ctx.caller)
-        return f"Player wins! Transferred {reward.get()} to {ctx.caller}."
+        currency.transfer(amount=reward.get(), to=recipient)
+        return f"Player wins! Transferred {reward.get()} to {recipient}."
     else:
         # Player loses
         return f"Player loses! {cost.get()} tokens were added to the contract."
+
 
 @export
 def balance():
