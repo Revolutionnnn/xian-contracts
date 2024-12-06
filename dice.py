@@ -61,38 +61,42 @@ def get_bets():
     return bet_list
 
 @export
-def accept_bet(bet_id: int, opponent_name: str, num1: int, num2: int):
+def accept_bet(bet_id: int, opponent_address: str, num1: int, num2: int):
     """
     Accepts a bet and resolves it by determining the winner.
-    The winner's name is returned instead of their address.
+    Returns the name of the bettor if they win, otherwise returns 'opponent_wins'.
     """
     assert ctx.caller == owner.get(), "Only the owner can access this function."
     bet = bets[bet_id]
     assert bet is not None, 'Bet ID does not exist.'
-    assert 'opponent_name' not in bet, 'Bet has already been accepted and resolved.'
-    assert opponent_name != bet['name'], 'Opponent cannot be the same as the bettor.'
+    assert 'resolved' not in bet, 'Bet has already been accepted and resolved.'
+    assert opponent_address != bet['address'], 'Opponent cannot be the same as the bettor.'
 
+    # Obtener detalles de la apuesta
+    bettor_name = bet['name']
+    bettor_address = bet['address']
     amount = bet['amount']
 
-    currency.transfer_from(amount=amount, to=ctx.this, main_account=ctx.caller)
+    # Transferir el monto de la apuesta del oponente al contrato
+    currency.transfer_from(amount=amount, to=ctx.this, main_account=opponent_address)
 
-    bettor_name = bet['name']
+    # Determinar el ganador
     total_amount = amount * 2
     commission = total_amount * commission_rate.get()
     payout = total_amount - commission
 
     if num2 > num1:
-        winner = opponent_name
+        # Oponente gana
+        winner_address = opponent_address
+        currency.transfer(amount=payout, to=winner_address)
+        bets[bet_id] = None
+        return "opponent_wins"
     else:
-        winner = bettor_name
-
-    # Distribute the payout
-    currency.transfer(amount=payout, to=ctx.caller if winner == opponent_name else bet['address'])
-
-    # Clear the bet
-    bets[bet_id] = None
-
-    return f"Bet accepted and resolved. Winner is {winner}. Total amount {payout} transferred after {commission} commission."
+        # Apostador gana
+        winner_address = bettor_address
+        currency.transfer(amount=payout, to=winner_address)
+        bets[bet_id] = None
+        return bettor_name  # Retorna el nombre del ganador (apostador)
 
 
 @export
