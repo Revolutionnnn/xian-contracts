@@ -1,4 +1,4 @@
-# 🎰 Lucky Spin Smart Contract (Versión Final)
+# 🎰 Lucky Spin Smart Contract (Versión Final Mejorada)
 
 # 📌 State declarations
 owner = Variable()
@@ -7,13 +7,16 @@ spin_fee = Variable()  # Costo de jugar
 jackpot = Variable()  # Premio mayor
 house_funds = Variable()  # Fondos acumulados de apuestas perdidas
 
-# 📌 Evento para registrar cada giro
+# 📌 Evento para registrar cada giro y mostrar las posibles ganancias
 SpinEvent = LogEvent(
     event="SpinResult",
     params={
         "player": {"type": str, "idx": True},
         "prize": {"type": int, "idx": False},
-        "jackpot": {"type": int, "idx": False}
+        "jackpot": {"type": int, "idx": False},
+        "potential_50_tokens": {"type": int, "idx": False},
+        "potential_100_tokens": {"type": int, "idx": False},
+        "potential_jackpot": {"type": int, "idx": False}
     }
 )
 
@@ -41,6 +44,11 @@ def spin():
     # 📌 Generar "aleatoriedad" usando block_hash
     randomness = int(block_hash, 16) % 100  
     
+    # 📌 Cálculo de los premios ANTES del giro para mostrarlo en el evento
+    potential_50_tokens = 50 + int(house_funds.get() * 0.1)
+    potential_100_tokens = 100 + int(house_funds.get() * 0.3)
+    potential_jackpot = jackpot.get() + house_funds.get()
+    
     # 📌 Lógica de ganancias y pérdidas
     if randomness < 50:  
         # 📌 50% de probabilidad de perder (nada se devuelve)
@@ -48,29 +56,29 @@ def spin():
         house_funds.set(house_funds.get() + fee)  # La pérdida va a los fondos de la casa
     elif randomness < 70:  
         # 📌 20% de ganar 50 tokens + 10% de house_funds
-        prize = 50 + int(house_funds.get() * 0.1)
+        prize = potential_50_tokens
         house_funds.set(house_funds.get() - int(house_funds.get() * 0.1))
     elif randomness < 90:  
         # 📌 20% de ganar 100 tokens + 30% de house_funds
-        prize = 100 + int(house_funds.get() * 0.3)
+        prize = potential_100_tokens
         house_funds.set(house_funds.get() - int(house_funds.get() * 0.3))
     else:  
         # 📌 10% de ganar el JACKPOT + 100% de house_funds
-        prize = jackpot.get() + house_funds.get()
+        prize = potential_jackpot
         jackpot.set(500)  # Restablecer el jackpot
         house_funds.set(0)  # Se entrega todo lo acumulado de la casa
 
     # 📌 Si el jugador gana, sumamos el premio a su saldo
     balances[player] += prize
-    
-    # 📌 Agregar una parte de las apuestas al jackpot
-    jackpot.set(jackpot.get() + (fee // 3))
 
-    # 📌 Emitir el evento con los resultados del giro
+    # 📌 Emitir el evento con los resultados del giro y los premios posibles
     SpinEvent({
         "player": player,
         "prize": prize,
-        "jackpot": jackpot.get()
+        "jackpot": jackpot.get(),
+        "potential_50_tokens": potential_50_tokens,
+        "potential_100_tokens": potential_100_tokens,
+        "potential_jackpot": potential_jackpot
     })
     
     return f"🎉 {player} ha ganado {prize} tokens. Jackpot actual: {jackpot.get()}"
